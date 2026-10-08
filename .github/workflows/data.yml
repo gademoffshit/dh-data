@@ -31,6 +31,13 @@ jobs:
       - name: build
         run: python build.py data
 
+      - name: pack
+        continue-on-error: true
+        timeout-minutes: 90
+        run: |
+          pip install lupa
+          python pack.py data/pack
+
       - name: publish
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,7 +53,7 @@ jobs:
       - name: refresh cdn
         continue-on-error: true
         run: |
-          for f in data/stats/*.txt data/manifest.json; do
+          for f in data/stats/*.txt data/manifest.json data/pack/*; do
             p="${f#data/}"
             curl -s -m 20 -o /dev/null "https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@draft-data/${p}" || true
           done
